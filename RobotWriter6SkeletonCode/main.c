@@ -28,7 +28,7 @@ void generateGCodeForText(FontChar fontDataArray[], const char *textFileName, fl
 void sendGCodeCommand(const char *command);
 void SendCommands(char *buffer);
 
-// Provide a definition for `SendCommands` if it is not linked
+// Provide a definition for SendCommands if it is not linked
 void SendCommands(char *buffer) {
     // Simulate sending G-code to the robot
     printf("%s", buffer);
@@ -54,7 +54,7 @@ int main() {
 
     printf("\nThe robot is now ready to draw\n");
 
-    // Initialize the robot
+    // Initialize the robot into start position
     sendGCodeCommand("G1 X0 Y0 F1000\n");
     sendGCodeCommand("M3\n");
     sendGCodeCommand("S0\n");
@@ -70,7 +70,7 @@ int main() {
     }
     scalingFactor /= 18.0f; // Calculate the scaling factor (height / 18)
 
-    // Load font data
+    // Load font data from SingleStrokefont
     if (!readFontData("SingleStrokeFont.txt", fontDataArray)) {
         printf("Error: Failed to read font data.\n");
         CloseRS232Port();
@@ -91,7 +91,7 @@ int main() {
     return 0;
 }
 
-// Function to read font data
+// Function to read font data from the file
 int readFontData(const char *filename, FontChar fontDataArray[]) {
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -104,7 +104,7 @@ int readFontData(const char *filename, FontChar fontDataArray[]) {
     int numStrokes = 0;
 
     while (fgets(line, sizeof(line), file)) {
-        if (strncmp(line, "999", 3) == 0) {
+        if (strncmp(line, "999", 3) == 0) {      // Detect new character definition
             if (sscanf(line, "999 %d %d", &currentChar, &numStrokes) != 2) {
                 printf("Error: Invalid '999' line format.\n");
                 fclose(file);
@@ -113,6 +113,7 @@ int readFontData(const char *filename, FontChar fontDataArray[]) {
             fontDataArray[currentChar].asciiCode = currentChar;
             fontDataArray[currentChar].strokeCount = numStrokes;
         } else if (currentChar != -1 && numStrokes > 0) {
+            // Read stroke data for the current character
             float x, y;
             int pen;
             if (sscanf(line, "%f %f %d", &x, &y, &pen) != 3) {
@@ -147,7 +148,7 @@ void generateGCodeForText(FontChar fontDataArray[], const char *textFileName, fl
             printf("Error: Word length exceeds buffer size.\n");
             continue; // Skip long words
         }
-
+        // Calculate the width of the word
         float wordWidth = 0.0f;
         for (int i = 0; word[i] != '\0'; i++) {
             int charIndex = word[i];
@@ -190,7 +191,7 @@ void generateGCodeForText(FontChar fontDataArray[], const char *textFileName, fl
     SendCommands(finalGcode);
 }
 
-// Wrapper function to send G-code commands to the robot
+// A Function to send G-code commands to the robot
 void sendGCodeCommand(const char *command) {
     char buffer[100];
     sprintf(buffer, "%s", command);
