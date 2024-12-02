@@ -191,7 +191,7 @@ void generateGCodeForText(FontChar fontDataArray[], const char *textFileName, fl
     SendCommands(finalGcode);
 }
 
-// Function to send G-code commands to the robot
+// A Function to send G-code commands to the robot
 void sendGCodeCommand(const char *command) {
     char buffer[100];
     sprintf(buffer, "%s", command);
