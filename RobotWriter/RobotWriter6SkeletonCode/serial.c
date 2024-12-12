@@ -5,7 +5,7 @@
 #include "rs232.h"
 
 
-//#define Serial_Mode
+// #define Serial_Mode
 
 #ifdef Serial_Mode
 
